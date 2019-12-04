@@ -1,0 +1,187 @@
+Numpy là package cơ bản cho khoa học máy tính với Python. Nó chứa các thứ sau:
+    - Đối tượng array N-dimensional (n chiều) đầy sức mạnh
+    - các hàm phức tạp, tinh với
+    - các công cụ cho việc tích hợp C/C++
+    - Hữu ích đại số tuyến tính, biến đổi Fourier, các số ngẫu nhiên.
+
+The Basics
+
+NumPy's main object là mảng nhiều chiều cùng tính chất. Là một bảng các phần tử, cùng type, được đánh số bởi một tuple (giá trị trong tuple đánh số cho mảng đó là số nguyên và không âm)
+Trong Numpy các chiều được gọi là axis (các trục)
+
+Ví dụ, tọa độ của một điểm trong không gian 3 chiều (point in 3D space) [1, 2, 1] được biểu diển có một trục. Trục này có 3 element trong nó, chúng ta nói nó có độ dài là 3.
+Trong ví dụ dưới đây, mảng có 2 trục. Trục thứ nhất có độ dài bằng 2, trục thứ hai có độ dài bằng 3.
+    [[1., 0., 0.],
+     [0., 1., 2.]]
+
+===> Ý hiểu: Một mảng ít nhất sẽ có 1 trục, nó có nhiều trục khi xảy ra cấu trúc dữ liệu con trong mỗi phần tử trong một trục.
+    - Nếu mỗi phần tử trong trục thứ nhất là dữ liệu nguyên thủy (kiểu int, double, string) thì nó sẽ chỉ có một trục. Nhưng nếu mỗi phần tử bản thân lại là một cấu trúc dữ liệu
+        ở đây cụ thể trong NumPy là một mảng thì nó bắt đầu có trục thứ hai, tương tự nếu phần tử trong trục thứ hai cũng không phải là nguyên thủy thì nó sẽ có trục thứ 3, và tiếp
+        diễn như vậy ta có các trục khác cho đến khi nó nhận được giá trị nguyên thủy thì trục đó sẽ là trục con cuối cùng. Nếu ta có n trục thì index trục chạy từ 1->n với root Là
+        trục số 1, và tại trục thứ k thì ta có k+1 là trục con của k và k-1 là cha của trục k. trục n sẽ không có trục con, trục root (là trục 1) sẽ không có trục cha.
+        Số phần tử trong một trục ta gọi là độ dài của trục đó, hoặc kích thước của trục đó
+
+Mảng của NumPy thực chất là class chứ không giống với các khái niệm mảng ở các ngôn ngữ khác, và cũng đếch giống array của chính bản thân thằng Python.
+Nó cũng được biết đến với nghệ danh array (nhưng thực chất phải là NumPy's array class)
+Class array của Numpy này có các attribute (thuộc tính) quan trọng là:
+    ndarray.ndim
+        số trục của Mảng
+    
+    ndarray.shape
+        kích thước của mảng, Là một tuple với các phần tử là số nguyên, mỗi phần tử nói cho ta biết độ dài của trục mà nó đang trỏ đến (thứ tự của các phần tử trong tuple tương ứng
+        với các trục bắt đầu chạy từ root cho đến trục cuối cùng). Chiều dài của tuple thì là số trục của mảng.
+    
+    ndarray.size
+        tổng số phần tử của mảng.
+
+    ndarray.dtype
+        kiểu dữ liệu của phần tử trong trục cuối cùng.
+
+    ndarray.itemsize
+        kích thước của mỗi phần tử trong trục cuối cùng.
+
+    ndarray.data
+        bộ nhớ đệm chứa các element thực tế của mảng
+
+
+Array Creation (Tạo mảng )
+    Có một vài cách để tạo một mảng của NumPy
+    Ví dụ, ta có thể tạo một mảng NumPy từ một biến là list hoặc tuple (2 cấu trúc dữ liệu định nghĩa trong Python) bằng cách sử dụng hàm numpy.array.
+
+    numpy.array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)
+    Parameter:
+        - object: ta sẽ truyền vào một đối tượng, đối tượng này sẽ có dạng list hoặc tuple của Python định nghĩa
+        - dtype: kiểu dữ liệu nguyên thủy, có thể truyền hoặc không
+            Kiểu dữ liệu mong muốn cho mảng NumPy. Nếu nó không được truyền vào thì nó sẽ lấy kiểu dữ liệu của element trong trục cuối cùng để gán. Tham số này chỉ có thể được sử
+            dụng khi ta truyền type bao trùm type của phần tử trong object truyền vào, nếu type truyền vào bé hơn ta phải sử dụng .astype(t) method để ép kiểu.
+        - copy: giá trị truyền vào True/False, mặc định True
+            Nếu true thì object được copy, tùy thuộc mục đích ta cần copy object để sử dụng tránh việc reference đến chính object thay đổi k kiểm soát dc.
+        - order: {'K', 'A', 'C', 'F'}, optional
+            xác định layout memory của mảng (quy tắc đặt phần tử vào bộ nhớ, cấu trúc). Nếu object không phải là một array, mảng được tạo mới sẽ là C (row) trừ phi 'F' (column)
+            được truyền. Nếu object là một mảng thì sẽ theo follow như sau:
+                -------------cái này đéo hiểu lắm và chưa cần thiết----------------
+        - subok: bool, optional
+            ---------chưa cần thiết-------------
+        - ndmin: int, optional
+            Thiết lập số trục bé nhất có thể, nếu có shape thỏa mãn điều kiện thì yêu cầu này sẽ được thực hiện.
+        - out: ndarray (n-dimensions-array)
+            Một đối tượng mảng n chiều thỏa mãn yêu cầu được xác định.
+
+
+Printing Arrays (In mảng, format and layout khi in nó)
+    Khi ta in array, NumPy cho ta thấy nó tương tự như các list lồng vào nhau và theo layout như sau.
+        - Trục cuối cùng được in từ trái qua phải, tức là các phần tử trục cuối được in từ trái qua phải
+        - Trục thứ 2 từ cuối lên sẽ được in từ trên xuống dưới
+        - Những thằng còn lại thì tương tự
+    Các mảng một chiều thì được in là các hàng, các mảng 2 chiều thì là các ma trận, các mảng 3 chiều thì là list(ma trận), các mảng 4 chiều thì là list(list (ma trận)),....
+
+    Các ma trận cỡ lớn quá nhiều phần tử thì nó sẽ bỏ những thằng ở giữa đi thay bằng ...., để bỏ đi hành động này thì trước khi in ta dúng hàm
+    numpy.set_printoptions(threshold=sys.maxsize)
+
+Basic Operations (Các toán tử cơ bản của đối tượng thuộc class array NumPy)
+Các toán tử toán học trên mảng thì áp dụng với các elementwise. Một mảng mới sẽ được tạo ra và được điền đầy đủ kết quả của phép toán ấy.
+-,+   Toán tử này áp dụng với 2 array giống nhau về shape
+*,/,** 
+    Áp dụng phép toán array với 1 số vô hướng, thì số vô hướng này sẽ tương tác với từng phần tử của array và trả về kết quả là array 
+    Nếu sử dụng phép nhân ma trận ta sẽ sử dụng toán tử A@B hoặc A.dot(B) thì sẽ cho ra toán tử như trong toán học về ma trận.
+Khi thực hiện các phép toán các array khác type với nhau thì kết quả trả về sẽ là type mà sao cho kết quả chi tiết nhất.
+
+Phân tích phép cộng mảng.
+Giả dụ ta có 2 mảng NumPy giống nhau về shape. Có 3 Trục, trục thứ 3 sẽ là các lá, các phần tử trục thứ 2 sẽ là các node trung gian
+
+                         A                                                            B
+                A1              A2                                             B1               B2
+            a   b   c       x     y   z                                   d    e   f       m     n     k
+
+Như trên ta có 2 đối tượng thuộc cấu trúc dữ liệu class array của Numpy
+Khi ta lấy A+B thì A và B đều không phải là đối tượng nguyên thủy mà chúng ta có thể cộng được, vì vậy ở đây chúng ta sẽ phải định nghĩa cho việc cộng các đối tượng của class này
+Với A trục thứ nhất của nó gồm 2 phần tử là [A1, A2] còn B là [B1, B2]
+Lúc này thì ta sẽ cộng các phần tử con của A với phần tử con của B từng đôi một với các index tương ứng.
+
+                                    C                               C
+                            A1+B1       A2+B2       =>      C1              C2
+
+Nhưng tiếp theo thì các phần tử trong trục thứ 1 cũng đéo phải là có thể cộng bt được và ta lại phải cộng theo định nghĩa đối vs cấu trúc dữ liệu đó
+
+Tiếp theo đó ta sẽ có các C1 = [a+d, b+e, c+f]      C2 = [x+m, y+n, z+k]
+Nếu mỗi trục ta đại diện nó là một cái tên gọn gàng thì sẽ rất dễ nhìn (giống như là phần tử nguyên thủy thì có nghĩa n đang được 1 số hoặc 1 chữ cái đại diện rất gọn). Từ Trục
+gần cuối là n-1 ta sẽ bắt đầu k có tên cho mỗi một node để đại diện cho phần tử trong trục n-1 vì vậy ta lấy trục tiếp nguyên cái cấu trúc của mảng phần tử của mỗi node đặt vào thay
+thế. Nhìn sẽ bị rối mắt và khá là khó chịu
+Thực tế khi cộng hay trừ 2 node với nhau, ta lấy các phần tử tương ứng cùng chỉ số trụ và chỉ số thứ tự trong trục, nếu n k phải thằng nguyên thủy ta lại tìm vào trong nó và thực
+hiện đệ quy cho đến khi gặp đối tượng mà ta cộng dc với nhau giữa 2 phần tử tương ứng thì ta được giá trị với chỉ số tương ứng trong cấu trúc đó. Và cuối cúng sau khi cộng hết đống
+phần tử là lá đó thì việc còn tự khắc các node cấp cao cũng bắt đầu tự biến đổi (Nếu dùng tên đại diện cho node thì tên sẽ tự bị biến đổi lệch đi còn không thì ta đặt cái tên mới
+cho node bậc cao bằng cấu tạo của nó gồm các phần tử trọng node được gom lại vào trong một cái []). Đây là một trường hợp nhỏ của cấu trúc dạng cây tree, việc cộng 2 cây với nhau thì
+ta cứ lấy các nhánh tương tứng của 2 cây để cộng.
+
+Universal Functions (Những hàm phổ biến)
+NumPy cung cấp các hàm toán học như sin, cos, and exp (số mũ). Trong NumPy thì những thằng này được gọi là "universal functions" (ufunc). Trong numpy, các hàm này vận hành 
+elementwise (vận hành trên các phần tử cấu tạo lên mảng) trên mảng, và cho kết quả ra là một mảng.
+
+Indexing, Sclicing and Iterating
+ndarray có thể be indexed sử dụng cú pháp x[obj] nơi mà x là array và obj là vị trí lựa chọn. Có 3 loại indexing được có hiệu lực: field access, basic slicing, advance indexing
+Trong Python x[(exp1, exp2, ..., expN)] và x[exp1, exp2, ...,expN] là giống nhau, cú pháp sau chỉ là cú pháp trước đây.
+
+    Basic Slicing and Indexing
+    What's slicing: Chúng ta sẽ gặp cú pháp slicing khi mà obj là một slice (obj được xây dựng bởi start:stop:step bên trong các dấu ngoặc như [],()), một integer, hoặc một tuple
+    của các slide object và và các integer
+    Numpy slicing tạo một view thay vì copy (nó sẽ cắt cho ta một view từ mảng chính). Cẩn thận khi sử dụng mảng cắt này ra vì nó là reference một phần từ mảng lớn. Nếu muốn sử
+    dụng không bị ảnh hưởng thì ta sẽ sử dụng một phương thức minh bạch copy()
+        Cú pháp cơ bản của slicing là:
+            i:j:k
+                - i là starting index
+                - j là stopping index (sẽ lấy giá trị từ j->j-1 và tới j thì dừng lại k lấy nữa)
+                - k là step (k!=0)
+            Cú pháp này sẽ chọn m element (trong kích thước tương úng) với index value i, i_k, ..., i+(m-1)k  với m = q + (r!=0) , q và r là số chia được và còn lại được chưa bới
+            việc chia j-i cho k: j-i = qk+r, vậy nên i+(m-1)k<j
+            Ví dụ:
+                >>> x=np.array([0,1,2,3,4,5,6,7,8,9])
+                >>> x[1:7:2]
+                array([1,3,5])
+
+            âm i và j được biên dịch như là n+i và n+j, ở đây thì n là số element trong kích thước tương ứng. âm k làm bước sẽ đi đến chỉ số nhỏ hơn
+            Ví dụ:
+                >>> x[-2:10]        ta có n =10 => start = 10-2, stop là 10 ---> vị trí số 8,9
+                array([8,9])
+                >>> x[-3:3:-1]      start = 10-3 = 7, stop là 3, bước nhảy âm nên nó sẽ chạy từ vị trí 7 ngược lại đến 3 ---> vị trí số 7,6,5,4
+                array(7,6,5,4)
+
+            Giả định rằng n là số element trong kích thước được cắt ra, thì nếu i không chạy từ 0 cho k>0 và n-1 cho k<0. Nếu j không là mặc định tới n cho k>0 và -n-1 cho k<0.
+            Nếu k không là 1. chú ý rằng :: là giống với : và có nghĩa là chọn tất cả theo chiều dài axis.
+            Ví dụ:
+                >>> x[5:]
+                array([5,6,7,8,9])
+
+            Khi dùng slicing có nghĩa là ta sẽ lấy các phần tử tương đương với chỉ số start-stop-step và gói vào và trả về một mảng các phần tử đó gọi là view của mảng nguồn
+            (mảng này chỉ là một view refer đến dữ liệu gốc của mảng nguồn). Còn index sẽ là chọn phần tử ở tại vị trí đó và tạo ra bản copy:
+                x[0:1] là hoàn toàn khác x[0]
+                x[0:1] là chọn các phần tử trong khoảng 0-1 và gói lại vào mảng (nhưng ở đây là th đặc biệt nên chỉ có 1 phần tử do chỉ số ta set)
+                x[0] là chọn phần tử tại vị trí 0 và lôi ra. tại vị trí 0 nó là mảng con thì lôi ra mảng con, nó là số vô hướng thì lôi ra là số vô hướng.
+
+        Advance indexing
+        Có 2 kiểu của advance indexing: integer và Boolean
+        Advance indexing luôn trả về một bản copy dữ liệu từ dữ liệu gốc (tương phản với basic slicing trả về một view)
+        Warning:
+            Việc định nghĩa của advance indexing có nghĩa rằng x[(1,2,3),] về cơ bản khác với x[(1,2,3)]. Thằng cuối thì tương đương với x[1,2,3] thằng này thì được gọi khi sử
+            dụng phiên bản cũ. 
+            Ta cũng nhận ra rằng x[[1,2,3]] sẽ được kích hoạt advance indexing, trong khi đó do sự tương thích Numeric yêu cầu đã đề cập bên trên x[(1,2,3),] sẽ kích hoạt basic
+            slicing
+           
+            A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+            A[0:1,:]
+            A[[0]]
+            2 cú pháp trên sẽ cho ra cùng một kết quả
+
+            advance indexing nếu chỉ có một tuple bên trong thì sẽ mỗi phần tử trong tuple trong ngăn cách bởi dấu "," là đại diện cho vị trí tại một Trục
+                vd: x[(1,2,3)] <=> x[1,2,3] nghĩa là lấy phần tử có index=1 tại trục đầu tiên, index=2 tại trục thứ 2 và index=3 tại trục thứ 3
+            advance indexing có chỉ mục là các tuple cách nhau bởi dấu "," thì mỗi tuple đại diện là một slicing 
+                vd: x[(1,2,3),]  lấy các phần tử có index 1,2,3 tại trục thứ nhất, nó sẽ trả về 1 view của mảng nguồn
+                cú pháp này sẽ trả về như bình thường nếu các tuple chỉ là dạng trả về số ít (có nghĩa là có tuple nhưng chỉ là 1 phần tử) lúc này nó không kích hoạt slicing
+                vd: x[(1),(2),(3)]
+                    
+            =>>> slicing ngoài cú pháp cơ bản cũng có thể được kích hoạt thông qua indexing khi indexing là advance indexing trả về số phần tử là số nhiều.
+            Cú pháp mix indexing + slicing:
+            x[(1,2,3),(1,2,3)] đây là cú pháp indexing thuần thì, tuple đầu tiên là hàng, tuple thứ 2 là cột. Các phần tử index sẽ được gán tương ứng vs nhau từng cặp Một
+                                thứ tự sẽ là: lấy ptu ở hàng 1 cột 1, hàng 2 cột 2, hàng 3 cột 3
+            x[(1,2,3),]
+
+        ===> Chốt: cứ lấy nhiều là phải trả về 1 mảng.
